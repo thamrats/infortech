@@ -1,3 +1,4 @@
+<html>
 <?php
 // ขายระบบ ลด 80% link    https://devbanban.com/?p=4425
 //ไฟล์เชื่อมต่อฐานข้อมูล
@@ -192,3 +193,4 @@ catch(Exception $e) {
   }  //catch
 } //isset devbanban.com
 ?>
+</html>
