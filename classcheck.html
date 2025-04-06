@@ -1,14 +1,4 @@
-<?php
-// ขายระบบ ลด 80% link    https://devbanban.com/?p=4425
-//ไฟล์เชื่อมต่อฐานข้อมูล
-require_once 'condb.php';
-//https://devbanban.com/?p=4425
-//คิวรี่ข้อมูลมาแสดงในตาราง
-$stmtChIn = $condb->prepare("SELECT * FROM tbl_checkIn as c INNER JOIN tbl_std as s ON c.std_code=s.std_code ORDER BY c.no DESC LIMIT 100");
-$stmtChIn->execute();
-$result = $stmtChIn->fetchAll();
-//https://devbanban.com/?p=4425
-?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -24,6 +14,17 @@ $result = $stmtChIn->fetchAll();
     
   </head>
   <body>
+    <?php
+// ขายระบบ ลด 80% link    https://devbanban.com/?p=4425
+//ไฟล์เชื่อมต่อฐานข้อมูล
+require_once 'condb.php';
+//https://devbanban.com/?p=4425
+//คิวรี่ข้อมูลมาแสดงในตาราง
+$stmtChIn = $condb->prepare("SELECT * FROM tbl_checkIn as c INNER JOIN tbl_std as s ON c.std_code=s.std_code ORDER BY c.no DESC LIMIT 100");
+$stmtChIn->execute();
+$result = $stmtChIn->fetchAll();
+//https://devbanban.com/?p=4425
+?>
     <!-- start menu -->
     <nav class="navbar navbar-expand-lg" style="background-color: green">
       <div class="container">   
