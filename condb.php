@@ -1,4 +1,3 @@
-<html>
 <?php
 // Turn off all error reporting
 //error_reporting(0);
@@ -25,4 +24,3 @@ date_default_timezone_set('Asia/Bangkok');
 // ขายระบบ ลด 80% link    https://devbanban.com/?p=4425
 
 ?>
-</html>
