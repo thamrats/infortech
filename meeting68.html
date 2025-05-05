@@ -53,7 +53,7 @@
 <div class="form-container">
   <h2>แบบประเมินความพึงพอใจกิจกรรมปฐมนิเทศ ปีการศีกษา 2568</h2>
   <form id="survey-form" action="https://docs.google.com/forms/d/e/1FAIpQLSdvyqZk-wZmr7QSScRMgNlPeq3hQOvy00FXYImLNaNu89HSqA/formResponse" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-    <label for="role">เลือกข้อมูล พร้อมประเมินระดับคะแนน 1:น้อยที่สุด 2:น้อย 3:ปานกลาง 4:มาก 5:มากที่สุด</label>
+    <label for="role">เลือกข้อมูล พร้อมประเมินระดับคะแนน 1. น้อยที่สุด และ 5. มากที่สุด</label>
     <label for="role">ข้อมูลส่วนตัว:</label>
     <select name="entry.1672552413" id="role" required>
       <option value="">-- กรุณาเลือก --</option>
@@ -72,8 +72,8 @@
 
     <label for="q1">1. ท่านมีความเข้าใจถึงวัตถุประสงค์ของกิจกรรมปฐมนิเทศนักเรียนใหม่ในครั้งนี้</label>
     <select name="entry.1683911201" id="q1" required>
-      <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="">-- กรุณาเลือก --</option>      
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -83,7 +83,7 @@
     <label for="q2">2. ท่านมีความเข้าใจถึงความสำคัญของกิจกรรมปฐมนิเทศนักเรียนใหม่ในครั้งนี้</label>
     <select name="entry.375308980" id="q2" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -93,7 +93,7 @@
     <label for="q3">3. ลำดับขั้นตอน/เนื้อหา/และวิธีการดำเนินกิจกรรมฯ มีความเหมาะสม</label>
     <select name="entry.1009629531" id="q3" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -103,7 +103,7 @@
     <label for="q4">4. ระยะเวลาในการจัดกิจกรรมปฐมนิเทศนักเรียนใหม่มีความเหมาะสม</label>
     <select name="entry.750722019" id="q4" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -113,7 +113,7 @@
     <label for="q5">5. สถานที่ที่ใช้ในการจัดกิจกรรมปฐมนิเทศนักเรียนใหม่มีความเหมาะสม</label>
     <select name="entry.1086032664" id="q5" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -123,7 +123,7 @@
     <label for="q6">6. สถานที่ที่ใช้ในการจัดกิจกรรมมอบตัวนักเรียนมีความเหมาะสม</label>
     <select name="entry.1066496770" id="q6" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -133,7 +133,7 @@
     <label for="q7">7. นักเรียนมีความประทับใจในการต้อนรับจากคุณครู</label>
     <select name="entry.1021664158" id="q7" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -143,7 +143,7 @@
     <label for="q8">8. นักเรียนมีความประทับใจในการให้บริการ/ตอบคำถามจากคุณครู</label>
     <select name="entry.204896574" id="q8" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -153,7 +153,7 @@
     <label for="q9">9. นักเรียนมีความประทับใจในบรรยากาศโดยทั่วไปของโรงเรียนฯ</label>
     <select name="entry.1322383840" id="q9" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
@@ -163,7 +163,7 @@
     <label for="q10">10. ภาพรวมของการจัดกิจกรรมปฐมนิเทศนักเรียนใหม่ในครั้งนี้มีความสมบูรณ์ ครบถ้วน</label>
     <select name="entry.2002112369" id="q10" required>
       <option value="">-- กรุณาเลือก --</option>
-      <option value="5">5 (มากที่สุด)</option>
+      <option value="5" selected>5 (มากที่สุด)</option>
       <option value="4">4 (มาก)</option>
       <option value="3">3 (ปานกลาง)</option>
       <option value="2">2 (น้อยที่สุด)</option>
