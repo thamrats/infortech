@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Student Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 2em; }
     .card { border: 1px solid #ccc; border-radius: 8px; padding: 1em; margin: 1em 0; }
@@ -10,6 +11,7 @@
     table { width: 100%; border-collapse: collapse; margin-top: 1em; }
     th, td { border: 1px solid #ddd; padding: 0.5em; text-align: left; }
     th { background-color: #f5f5f5; }
+    canvas { max-width: 100%; height: auto; }
   </style>
 </head>
 <body>
@@ -31,6 +33,7 @@
       <tr><td>สมหญิง ขยันเรียน</td><td>85</td></tr>
       <tr><td>มานะ มุ่งมั่น</td><td>73</td></tr>
     </table>
+    <canvas id="studentChart"></canvas>
   </div>
 
   <div class="card">
@@ -43,7 +46,43 @@
       <tr><td>สอบกลางภาค</td><td>20</td></tr>
       <tr><td>สอบปลายภาค</td><td>20</td></tr>
     </table>
+    <canvas id="criteriaChart"></canvas>
   </div>
+
+  <script>
+    const studentChart = new Chart(document.getElementById('studentChart'), {
+      type: 'bar',
+      data: {
+        labels: ['สมชาย ใจดี', 'สมหญิง ขยันเรียน', 'มานะ มุ่งมั่น'],
+        datasets: [{
+          label: 'คะแนนรวม',
+          data: [90, 85, 73],
+          backgroundColor: '#4CAF50'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, title: { display: true, text: 'คะแนนนักเรียนแต่ละคน' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    const criteriaChart = new Chart(document.getElementById('criteriaChart'), {
+      type: 'pie',
+      data: {
+        labels: ['การมีส่วนร่วม', 'งานกลุ่ม', 'การบ้าน', 'สอบกลางภาค', 'สอบปลายภาค'],
+        datasets: [{
+          label: 'คะแนน',
+          data: [20, 20, 20, 20, 20],
+          backgroundColor: ['#f44336', '#2196F3', '#FFC107', '#4CAF50', '#9C27B0']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { title: { display: true, text: 'สัดส่วนคะแนนตามเกณฑ์' } }
+      }
+    });
+  </script>
 
 </body>
 </html>
