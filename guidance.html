@@ -1,0 +1,513 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบงานแนะแนว</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #F0FFF4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #E6FFFA;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background-color: #68D391;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #4ADE80;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <center><img src="https://img2.pic.in.th/pic/logobf26360b53eb34aa.png" alt="logo" border="0" width="100" height="100"></a></center>
+        <br>
+        <h3 class="text-2xl font-bold text-center mb-6 text-green-600">โรงเรียนกุดเรือคำพิทยาคาร</h3>
+        <h1 class="text-3xl font-bold text-center mb-6 text-green-600">ระบบงานแนะแนวและแฟ้มสะสมงาน</h1>
+
+        <!-- Student Management -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 text-green-700">ข้อมูลนักเรียน</h2>
+            <div class="flex justify-between mb-4">
+                <input type="text" id="searchStudent" class="border p-2 rounded w-2/3" placeholder="ค้นหานักเรียน...">
+                <div class="flex items-center">
+                    <label class="mr-2">แสดง</label>
+                    <select id="studentLimit" class="border p-2 rounded">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+            <form id="studentForm" class="grid grid-cols-2 gap-4">
+                <input type="hidden" id="studentId">
+                <input type="text" id="fullName" class="border p-2 rounded" placeholder="ชื่อ-นามสกุล" required>
+                <input type="text" id="classRoom" class="border p-2 rounded" placeholder="ห้อง" required>
+                <input type="text" id="studentNumber" class="border p-2 rounded" placeholder="เลขที่" required>
+                <input type="text" id="studentIdNumber" class="border p-2 rounded" placeholder="เลขประจำตัวนักเรียน" required>
+                <input type="text" id="citizenId" class="border p-2 rounded" placeholder="เลขบัตรประชาชน" required>                
+                <select id="academicYear" class="border p-2 rounded" required>
+                <option value="">เลือกปีการศึกษา</option>
+                    <option value="2568">2568</option>
+                    <option value="2569">2569</option>                    
+                </select>
+                <input type="text" id="phone" class="border p-2 rounded" placeholder="เบอร์ติดต่อ" required>
+                <input type="text" id="lineId" class="border p-2 rounded" placeholder="Line ID">
+                <input type="text" id="facebook" class="border p-2 rounded" placeholder="Facebook">
+                <button type="submit" class="btn col-span-2">บันทึก</button>
+            </form>
+            <table class="w-full mt-4 border-collapse">
+                <thead>
+                    <tr class="bg-green-200">
+                        <th class="border p-2">ชื่อ-นามสกุล</th>
+                        <th class="border p-2">ห้อง</th>
+                        <th class="border p-2">เลขที่</th>
+                        <th class="border p-2">เลขประจำตัว</th>
+                        <th class="border p-2">ปีการศึกษา</th>
+                        <th class="border p-2">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+            </table>
+            <div class="flex justify-between mt-4">
+                <button id="prevStudentPage" class="btn">ก่อนหน้า</button>
+                <span id="studentPageInfo"></span>
+                <button id="nextStudentPage" class="btn">ถัดไป</button>
+            </div>
+        </div>
+
+        <!-- Portfolio Management -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 text-green-700">บันทึกแฟ้มสะสมงาน</h2>
+            <div class="flex justify-between mb-4">
+                <input type="text" id="searchPortfolio" class="border p-2 rounded w-2/3" placeholder="ค้นหาแฟ้มสะสมงาน...">
+                <div class="flex items-center">
+                    <label class="mr-2">แสดง</label>
+                    <select id="portfolioLimit" class="border p-2 rounded">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+            <form id="portfolioForm" class="grid grid-cols-2 gap-4">
+                <input type="hidden" id="portfolioId">
+                <select id="portfolioStudentId" class="border p-2 rounded" required>
+                    <option value="">เลือกนักเรียน</option>
+                </select>
+                <input type="text" id="faculty" class="border p-2 rounded" placeholder="คณะ" required>
+                <input type="text" id="major" class="border p-2 rounded" placeholder="สาขาวิชา" required>
+                <input type="text" id="university" class="border p-2 rounded" placeholder="มหาวิทยาลัย" required>
+                <select id="roundStatus" class="border p-2 rounded" required>
+                    <option value="">เลือกสถานะ</option>
+                    <option value="ยื่นแฟ้ม">ยื่นแฟ้มสะสมงาน</option>
+                    <option value="ผ่านรอบพอร์ต">ผ่านรอบแฟ้มสะสมงาน</option>
+                    <option value="ผ่านรอบโควต้า">ผ่านรอบโควต้า</option>
+                    <option value="ผ่านรอบแอดมิทชั่น">ผ่านรอบแอดมิทชั่น</option>
+                    <option value="ผ่านรอบไดเร็กแอดมิทชั่น">ผ่านรอบไดเร็กแอดมิทชั่น</option>
+                </select>
+                <input type="file" id="pdfFile" class="border p-2 rounded" accept=".pdf">
+                <input type="text" id="link" class="border p-2 rounded" placeholder="Link">
+                <button type="submit" class="btn col-span-2">บันทึก</button>
+            </form>
+            <table class="w-full mt-4 border-collapse">
+                <thead>
+                    <tr class="bg-green-200">
+                        <th class="border p-2">นักเรียน</th>
+                        <th class="border p-2">คณะ</th>
+                        <th class="border p-2">สาขาวิชา</th>
+                        <th class="border p-2">มหาวิทยาลัย</th>
+                        <th class="border p-2">สถานะรอบ</th>
+                        <th class="border p-2">ไฟล์</th>
+                        <th class="border p-2">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="portfolioTable"></tbody>
+            </table>
+            <div class="flex justify-between mt-4">
+                <button id="prevPortfolioPage" class="btn">ก่อนหน้า</button>
+                <span id="portfolioPageInfo"></span>
+                <button id="nextPortfolioPage" class="btn">ถัดไป</button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card">
+            <h2 class="text-2xl font-bold mb-4 text-green-700">สถิติ</h2>
+            <div class="grid grid-cols-4 gap-4">
+                <div>
+                    <h3 class="text-lg font-bold">มหาวิทยาลัย</h3>
+                    <canvas id="universityChart"></canvas>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold">คณะ</h3>
+                    <canvas id="facultyChart"></canvas>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold">สาขาวิชา</h3>
+                    <canvas id="majorChart"></canvas>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold">สถานะ</h3>
+                    <canvas id="roundStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let studentPage = 1;
+        let studentLimit = 10;
+        let studentData = [];
+        let portfolioPage = 1;
+        let portfolioLimit = 10;
+        let portfolioData = [];
+
+        // Student Management
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const student = {
+                id: document.getElementById('studentId').value,
+                fullName: document.getElementById('fullName').value,
+                classRoom: document.getElementById('classRoom').value,
+                studentNumber: document.getElementById('studentNumber').value,
+                studentIdNumber: document.getElementById('studentIdNumber').value,
+                citizenId: document.getElementById('citizenId').value,
+                academicYear: document.getElementById('academicYear').value,
+                phone: document.getElementById('phone').value,
+                lineId: document.getElementById('lineId').value,
+                facebook: document.getElementById('facebook').value
+            };
+            fetch('api.php?action=saveStudent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(student)
+            }).then(() => {
+                loadStudents();
+                document.getElementById('studentForm').reset();
+                document.getElementById('studentId').value = '';
+            });
+        });
+
+        document.getElementById('searchStudent').addEventListener('input', function() {
+            studentPage = 1;
+            loadStudents(this.value);
+        });
+
+        document.getElementById('studentLimit').addEventListener('change', function() {
+            studentLimit = parseInt(this.value);
+            studentPage = 1;
+            loadStudents(document.getElementById('searchStudent').value);
+        });
+
+        document.getElementById('prevStudentPage').addEventListener('click', function() {
+            if (studentPage > 1) {
+                studentPage--;
+                renderStudents();
+            }
+        });
+
+        document.getElementById('nextStudentPage').addEventListener('click', function() {
+            if (studentPage * studentLimit < studentData.length) {
+                studentPage++;
+                renderStudents();
+            }
+        });
+
+        function loadStudents(search = '') {
+            fetch(`api.php?action=getStudents&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    studentData = data;
+                    renderStudents();
+                    loadStudentOptions();
+                });
+        }
+
+        function renderStudents() {
+            const table = document.getElementById('studentTable');
+            table.innerHTML = '';
+            const start = (studentPage - 1) * studentLimit;
+            const end = start + studentLimit;
+            const paginatedData = studentData.slice(start, end);
+
+            paginatedData.forEach(student => {
+                const row = `<tr>
+                    <td class="border p-2">${student.fullName}</td>
+                    <td class="border p-2">${student.classRoom}</td>
+                    <td class="border p-2">${student.studentNumber}</td>
+                    <td class="border p-2">${student.studentIdNumber}</td>
+                    <td class="border p-2">${student.academicYear}</td>
+                    <td class="border p-2">
+                        <button class="btn mr-2" onclick="editStudent(${student.id})">แก้ไข</button>
+                        <button class="btn bg-red-500" onclick="deleteStudent(${student.id})">ลบ</button>
+                    </td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+
+            document.getElementById('studentPageInfo').textContent = `หน้า ${studentPage} จาก ${Math.ceil(studentData.length / studentLimit)}`;
+        }
+
+        function editStudent(id) {
+            fetch(`api.php?action=getStudent&id=${id}`)
+                .then(response => response.json())
+                .then(student => {
+                    document.getElementById('studentId').value = student.id;
+                    document.getElementById('fullName').value = student.fullName;
+                    document.getElementById('classRoom').value = student.classRoom;
+                    document.getElementById('studentNumber').value = student.studentNumber;
+                    document.getElementById('studentIdNumber').value = student.studentIdNumber;
+                    document.getElementById('citizenId').value = student.citizenId;
+                    document.getElementById('academicYear').value = student.academicYear;
+                    document.getElementById('phone').value = student.phone;
+                    document.getElementById('lineId').value = student.lineId;
+                    document.getElementById('facebook').value = student.facebook;
+                });
+        }
+
+        // function deleteStudent(id) {
+        //     if (confirm('ยืนยันการลบ?')) {
+        //         fetch(`api.php?action=deleteStudent&id=${id}`, { method: 'POST' })
+        //             .then(() => loadStudents());
+        //     }
+        // }
+
+        // Portfolio Management
+        document.getElementById('portfolioForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('id', document.getElementById('portfolioId').value);
+            formData.append('studentId', document.getElementById('portfolioStudentId').value);
+            formData.append('faculty', document.getElementById('faculty').value);
+            formData.append('major', document.getElementById('major').value);
+            formData.append('university', document.getElementById('university').value);
+            formData.append('roundStatus', document.getElementById('roundStatus').value);
+            formData.append('pdfFile', document.getElementById('pdfFile').files[0]);
+            formData.append('link', document.getElementById('link').value);
+            fetch('api.php?action=savePortfolio', {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                loadPortfolios();
+                document.getElementById('portfolioForm').reset();
+                document.getElementById('portfolioId').value = '';
+            });
+        });
+
+        document.getElementById('searchPortfolio').addEventListener('input', function() {
+            portfolioPage = 1;
+            loadPortfolios(this.value);
+        });
+
+        document.getElementById('portfolioLimit').addEventListener('change', function() {
+            portfolioLimit = parseInt(this.value);
+            portfolioPage = 1;
+            loadPortfolios(document.getElementById('searchPortfolio').value);
+        });
+
+        document.getElementById('prevPortfolioPage').addEventListener('click', function() {
+            if (portfolioPage > 1) {
+                portfolioPage--;
+                renderPortfolios();
+            }
+        });
+
+        document.getElementById('nextPortfolioPage').addEventListener('click', function() {
+            if (portfolioPage * portfolioLimit < portfolioData.length) {
+                portfolioPage++;
+                renderPortfolios();
+            }
+        });
+
+        function loadPortfolios(search = '') {
+            fetch(`api.php?action=getPortfolios&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    portfolioData = data;
+                    renderPortfolios();
+                    loadStatistics();
+                });
+        }
+
+        function renderPortfolios() {
+            const table = document.getElementById('portfolioTable');
+            table.innerHTML = '';
+            const start = (portfolioPage - 1) * portfolioLimit;
+            const end = start + portfolioLimit;
+            const paginatedData = portfolioData.slice(start, end);
+
+            paginatedData.forEach(portfolio => {
+                const row = `<tr>
+                    <td class="border p-2">${portfolio.studentName}</td>
+                    <td class="border p-2">${portfolio.faculty}</td>
+                    <td class="border p-2">${portfolio.major}</td>
+                    <td class="border p-2">${portfolio.university}</td>
+                    <td class="border p-2">${portfolio.roundStatus}</td>
+                    <td class="border p-2">${portfolio.pdfPath ? `<a href="${portfolio.pdfPath}" target="_blank">ไฟล์</a>` : portfolio.link}</td>
+                    <td class="border p-2">
+                        <button class="btn mr-2" onclick="editPortfolio(${portfolio.id})">แก้ไข</button>
+                        <button class="btn bg-red-500" onclick="deletePortfolio(${portfolio.id})">ลบ</button>
+                    </td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+
+            document.getElementById('portfolioPageInfo').textContent = `หน้า ${portfolioPage} จาก ${Math.ceil(portfolioData.length / portfolioLimit)}`;
+        }
+
+        function editPortfolio(id) {
+            fetch(`api.php?action=getPortfolio&id=${id}`)
+                .then(response => response.json())
+                .then(portfolio => {
+                    document.getElementById('portfolioId').value = portfolio.id;
+                    document.getElementById('portfolioStudentId').value = portfolio.studentId;
+                    document.getElementById('faculty').value = portfolio.faculty;
+                    document.getElementById('major').value = portfolio.major;
+                    document.getElementById('university').value = portfolio.university;
+                    document.getElementById('roundStatus').value = portfolio.roundStatus;
+                    document.getElementById('link').value = portfolio.link;
+                });
+        }
+
+        function deletePortfolio(id) {
+            if (confirm('ยืนยันการลบ?')) {
+                fetch(`api.php?action=deletePortfolio&id=${id}`, { method: 'POST' })
+                    .then(() => loadPortfolios());
+            }
+        }
+
+        function loadStudentOptions() {
+            fetch('api.php?action=getStudents')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('portfolioStudentId');
+                    select.innerHTML = '<option value="">เลือกนักเรียน</option>';
+                    data.forEach(student => {
+                        select.innerHTML += `<option value="${student.id}">${student.fullName}</option>`;
+                    });
+                });
+        }
+
+        // Statistics
+        function loadStatistics() {
+            fetch('api.php?action=getStatistics')
+                .then(response => response.json())
+                .then(data => {
+                    // University Chart
+                    new Chart(document.getElementById('universityChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data.university),
+                            datasets: [{
+                                data: Object.values(data.university),
+                                backgroundColor: ['#68D391', '#4ADE80', '#34D399', '#6EE7B7', '#A7F3D0']
+                            }]
+                        }
+                    });
+
+                    // Faculty Chart
+                    new Chart(document.getElementById('facultyChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data.faculty),
+                            datasets: [{
+                                data: Object.values(data.faculty),
+                                backgroundColor: ['#68D391', '#4ADE80', '#34D399', '#6EE7B7', '#A7F3D0']
+                            }]
+                        }
+                    });
+
+                    // Major Chart
+                    new Chart(document.getElementById('majorChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data.major),
+                            datasets: [{
+                                data: Object.values(data.major),
+                                backgroundColor: ['#68D391', '#4ADE80', '#34D399', '#6EE7B7', '#A7F3D0']
+                            }]
+                        }
+                    });
+
+                    // Round Status Chart
+                    new Chart(document.getElementById('roundStatusChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data.roundStatus),
+                            datasets: [{
+                                data: Object.values(data.roundStatus),
+                                backgroundColor: ['#68D391', '#EF4444'] // Green for Pass, Red for Fail
+                            }]
+                        }
+                    });
+                });
+        }
+
+        // Initial Load
+        loadStudents();
+        loadPortfolios();
+    </script>
+</body>
+</html>
