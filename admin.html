@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - ระบบงานโรงเรียน</title>
+   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Mitr:wght@200;300;400;500;600;700&family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Serif+Thai:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Taviraj:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(to right, #d0f0c0, #b2dfdb);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #388e3c;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.8rem;
+    }
+
+    main {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      margin-top: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #388e3c;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin-top: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #388e3c;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .actions button {
+      background: #f44336;
+      margin-right: 10px;
+    }
+
+    .actions button.edit {
+      background: #ff9800;
+    }
+
+    .actions button:hover {
+      opacity: 0.9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.8rem;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    🛠️ จัดการระบบงานโรงเรียน (Admin)
+  </header>
+
+  <main>
+    <h2>เพิ่มรายการงาน</h2>
+    <form id="workForm">
+      <label for="category">หมวดหมู่</label>
+      <select id="category" required>
+        <option value="">-- เลือกหมวดหมู่ --</option>
+        <option value="วิชาการ">บริหารวิชาการ</option>
+        <option value="บุคคล">บริหารงานบุคคล</option>
+        <option value="ทั่วไป">บริหารทั่วไป</option>
+        <option value="งบประมาณ">บริหารงบประมาณและแผน</option>
+      </select>
+
+      <label for="title">ชื่องาน</label>
+      <input type="text" id="title" placeholder="เช่น ตารางสอน ภาคเรียน 1/2568" required />
+
+      <button type="submit">➕ เพิ่มรายการ</button>
+    </form>
+
+    <h2>รายการงานทั้งหมด</h2>
+    <table id="workTable">
+      <thead>
+        <tr>
+          <th>หมวดหมู่</th>
+          <th>ชื่อเรื่อง</th>
+          <th>การจัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dynamic Row -->
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+     &copy; 2568 โรงเรียนกุดเรือคำพิทยาคารา | พัฒนาโดยทีมงาน infortech
+  </footer>
+
+  <script>
+    const form = document.getElementById('workForm');
+    const tableBody = document.querySelector('#workTable tbody');
+    let editIndex = -1;
+    let data = [];
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const category = document.getElementById('category').value;
+      const title = document.getElementById('title').value;
+
+      if (editIndex === -1) {
+        data.push({ category, title });
+      } else {
+        data[editIndex] = { category, title };
+        editIndex = -1;
+      }
+
+      form.reset();
+      renderTable();
+    });
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.category}</td>
+          <td>${item.title}</td>
+          <td class="actions">
+            <button class="edit" onclick="editItem(${index})">แก้ไข</button>
+            <button onclick="deleteItem(${index})">ลบ</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function deleteItem(index) {
+      if (confirm("คุณแน่ใจว่าต้องการลบรายการนี้?")) {
+        data.splice(index, 1);
+        renderTable();
+      }
+    }
+
+    function editItem(index) {
+      const item = data[index];
+      document.getElementById('category').value = item.category;
+      document.getElementById('title').value = item.title;
+      editIndex = index;
+    }
+  </script>
+</body>
+</html>
