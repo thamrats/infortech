@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Digital - จดทะเบียนบริษัท ยุค AI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00F2FE;
+            --secondary: #4FACFE;
+            --accent: #8B5CF6;
+            --dark-bg: #0F172A;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #F8FAFC;
+            --text-dim: #94A3B8;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        nav.scrolled {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 1rem 5%;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 400;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .cta-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            transition: var(--transition);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        /* Hero Section */
+        header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 5%;
+            position: relative;
+            background: radial-gradient(circle at top right, rgba(79, 172, 254, 0.1), transparent),
+                        radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.1), transparent);
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Services Grid */
+        .section {
+            padding: 100px 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: var(--text-dim);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .service-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* AI Feature Section */
+        .ai-feature {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4rem;
+            border-radius: 30px;
+        }
+
+        .ai-text {
+            flex: 1;
+        }
+
+        .ai-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .ai-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pricing-card.popular {
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: -15px;
+            background: var(--primary);
+            color: var(--dark-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .features-list li {
+            margin-bottom: 0.8rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list li i {
+            color: var(--primary);
+        }
+
+        /* Contact Form */
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links a {
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .ai-feature { flex-direction: column; padding: 2rem; }
+            .section { padding: 60px 5%; }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-content {
+            animation: fadeIn 1s ease-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Nav Bar -->
+    <nav id="navbar">
+        <div class="logo">
+            <i class="fas fa-microchip"></i>
+            NEXUS DIGITAL
+        </div>
+        <ul class="nav-links">
+            <li><a href="#services">บริการ</a></li>
+            <li><a href="#ai-tech">เทคโนโลยี AI</a></li>
+            <li><a href="#pricing">ราคา</a></li>
+            <li><a href="#contact">ติดต่อเรา</a></li>
+        </ul>
+        <a href="#contact" class="cta-btn">ปรึกษาฟรี</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <header>
+        <div class="hero-content">
+            <h1>จดทะเบียนบริษัท ยุคใหม่<br>ด้วยเทคโนโลยี AI</h1>
+            <p>สัมผัสประสบการณ์การจดทะเบียนธุรกิจที่รวดเร็ว แม่นยำ และทันสมัยที่สุด ด้วยระบบวิเคราะห์เอกสารอัตโนมัติ ช่วยคุณเริ่มต้นธุรกิจได้ภายใน 24 ชั่วโมง</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="#pricing" class="cta-btn">เริ่มจดทะเบียนเลย</a>
+                <a href="#services" class="cta-btn" style="background: transparent; border: 1px solid var(--primary);">ดูบริการทั้งหมด</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Services Section -->
+    <section class="section" id="services">
+        <div class="section-title">
+            <h2>บริการครบวงจรเพื่อธุรกิจคุณ</h2>
+            <p>จากเริ่มต้นจนเติบโต เราดูแลให้ทุกขั้นตอน</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card glass">
+                <i class="fas fa-building service-icon"></i>
+                <h3>จดทะเบียนบริษัท</h3>
+                <p>จดทะเบียนนิติบุคคล ห้างหุ้นส่วนจำกัด ครบถ้วนตามกฎหมาย พร้อมรับเอกสารทันใจ</p>
+            </div>
+            <div class="service-card glass">
+                <i class="fas fa-calculator service-icon"></i>
+                <h3>บัญชีและภาษี</h3>
+                <p>ระบบบัญชี Cloud บันทึกรายได้ค่าใช้จ่ายอัตโนมัติ ลดข้อผิดพลาดด้วยระบบ AI Scan</p>
+            </div>
+            <div class="service-card glass">
+                <i class="fas fa-file-invoice-dollar service-icon"></i>
+                <h3>จดภาษีมูลค่าเพิ่ม</h3>
+                <p>ดำเนินการขอเลขประจำตัวผู้เสียภาษี และจด VAT ให้คุณพร้อมดำเนินธุรกิจทันที</p>
+            </div>
+            <div class="service-card glass">
+                <i class="fas fa-shield-halved service-icon"></i>
+                <h3>จดเครื่องหมายการค้า</h3>
+                <p>ปกป้องแบรนด์ของคุณด้วยการจดทะเบียนเครื่องหมายการค้า ตรวจสอบความซ้ำซ้อนด้วย AI</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Feature Section -->
+    <section class="section" id="ai-tech">
+        <div class="ai-feature glass">
+            <div class="ai-text">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem;">นวัตกรรมที่เหนือกว่า</h2>
+                <p style="color: var(--text-dim); margin-bottom: 2rem;">เรานำ AI มาช่วยตรวจสอบความถูกต้องของชื่อบริษัทและที่อยู่เอกสารแบบ Real-time ลดโอกาสการถูกตีกลับจากกรมพัฒนาธุรกิจการค้าลง 99%</p>
+                <ul class="features-list">
+                    <li><i class="fas fa-bolt"></i> ระบบตรวจสอบชื่อบริษัทอัตโนมัติ</li>
+                    <li><i class="fas fa-robot"></i> AI ประมวลผลเอกสารอัตโนมัติ</li>
+                    <li><i class="fas fa-lock"></i> ระบบความปลอดภัยข้อมูลมาตรฐานสากล</li>
+                </ul>
+            </div>
+            <div class="ai-image">
+                <!-- Using an SVG placeholder for a modern look -->
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" style="border-radius: 20px; overflow: hidden;">
+                    <rect width="500" height="400" fill="#1E293B"/>
+                    <circle cx="250" cy="200" r="80" fill="url(#grad1)" opacity="0.6"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:var(--accent);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M100 300 Q250 100 400 300" stroke="var(--primary)" stroke-width="4" fill="none" opacity="0.3"/>
+                    <text x="50%" y="90%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="12">AI Processing Analysis Dashboard</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section" id="pricing">
+        <div class="section-title">
+            <h2>แพ็กเกจจดทะเบียน</h2>
+            <p>โปร่งใส ไม่มีค่าใช้จ่ายแอบแฝง</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card glass">
+                <h3>เริ่มต้น (Basic)</h3>
+                <div class="price">5,900 <span>บาท</span></div>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> จดทะเบียนบริษัท</li>
+                    <li><i class="fas fa-check"></i> ตราประทับ 1 ชิ้น</li>
+                    <li><i class="fas fa-check"></i> คัดสำเนาหนังสือรับรอง</li>
+                    <li style="opacity: 0.5;"><i class="fas fa-times"></i> จด VAT ฟรี</li>
+                </ul>
+                <a href="#" class="cta-btn" style="width: 100%; text-align: center;">เลือกแพ็กเกจนี้</a>
+            </div>
+            <div class="pricing-card glass popular">
+                <div class="popular-tag">ยอดนิยม</div>
+                <h3>มือโปร (Professional)</h3>
+                <div class="price">9,900 <span>บาท</span></div>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> จดทะเบียนบริษัท</li>
+                    <li><i class="fas fa-check"></i> จด VAT & ประกันสังคม</li>
+                    <li><i class="fas fa-check"></i> บัญชี Cloud ฟรี 3 เดือน</li>
+                    <li><i class="fas fa-check"></i> ปรึกษาธุรกิจส่วนตัว</li>
+                </ul>
+                <a href="#" class="cta-btn" style="width: 100%; text-align: center;">เลือกแพ็กเกจนี้</a>
+            </div>
+            <div class="pricing-card glass">
+                <h3>พรีเมียม (Enterprise)</h3>
+                <div class="price">19,000 <span>บาท</span></div>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> จดทะเบียนบริษัท (รวมทุนประกัน)</li>
+                    <li><i class="fas fa-check"></i> จดเครื่องหมายการค้า 1 รายการ</li>
+                    <li><i class="fas fa-check"></i> จดทะเบียนภาษีมูลค่าเพิ่ม</li>
+                    <li><i class="fas fa-check"></i> ดูแลบัญชีรายปี</li>
+                </ul>
+                <a href="#" class="cta-btn" style="width: 100%; text-align: center;">เลือกแพ็กเกจนี้</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="section-title">
+            <h2>ปรึกษาผู้เชี่ยวชาญ</h2>
+            <p>กรอกรายละเอียดเพื่อให้เราติดต่อกลับโดยเร็วที่สุด</p>
+        </div>
+        <div class="contact-container glass">
+            <form>
+                <div class="form-group">
+                    <label>ชื่อ-นามสกุล</label>
+                    <input type="text" placeholder="ระบุชื่อของคุณ">
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์</label>
+                    <input type="tel" placeholder="0xx-xxx-xxxx">
+                </div>
+                <div class="form-group">
+                    <label>บริการที่สนใจ</label>
+                    <input type="text" placeholder="เช่น จดทะเบียนบริษัท, ทำบัญชี">
+                </div>
+                <div class="form-group">
+                    <label>ข้อความเพิ่มเติม</label>
+                    <textarea rows="4" placeholder="รายละเอียดเพิ่มเติมที่ต้องการปรึกษา"></textarea>
+                </div>
+                <button type="submit" class="cta-btn" style="width: 100%; border: none; cursor: pointer;">ส่งข้อมูลเพื่อปรึกษาฟรี</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <i class="fas fa-microchip"></i>
+            NEXUS DIGITAL
+        </div>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-line"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">&copy; 2025 Nexus Digital Business Registration. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scroll for links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
