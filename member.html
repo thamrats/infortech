@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสมาชิก - Member Management</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234f46e5'/><circle cx='50' cy='40' r='15' fill='white'/><path d='M20 80c0-15 10-25 30-25s30 10 30 25' fill='white'/></svg>">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --secondary: #64748b;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .logo-icon { width: 32px; height: 32px; }
+        .logo-text { font-weight: 700; font-size: 1.5rem; letter-spacing: -0.5px; }
+
+        .nav-links { list-style: none; }
+        .nav-links li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .nav-links li:hover {
+            background-color: var(--bg-main);
+            color: var(--primary);
+        }
+
+        .nav-links li.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-links li i { width: 20px; height: 20px; }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 18px;
+            height: 18px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-results {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .search-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-item:last-child { border-bottom: none; }
+        .search-item:hover { background: var(--bg-main); }
+        .search-item .name { font-weight: 500; }
+        .search-item .phone { font-size: 0.85rem; color: var(--text-muted); }
+
+        .user-actions { display: flex; gap: 1rem; align-items: center; }
+        .btn-icon {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .user-avatar-mini {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover { background: #4338ca; }
+
+        .btn-secondary {
+            background: var(--bg-main);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger:hover { background: #fecaca; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 0;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-group input:focus { border-color: var(--primary); }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Common Card */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 { margin-bottom: 1.25rem; font-size: 1.1rem; }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .profile-main-info { display: flex; align-items: center; gap: 1.5rem; }
+        .large-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .quick-stats { display: flex; gap: 2rem; }
+        .stat { display: flex; flex-direction: column; }
+        .stat .label { font-size: 0.85rem; color: var(--text-muted); }
+        .stat .value { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row i { color: var(--primary); width: 18px; }
+        .detail-row span { color: var(--text-muted); min-width: 80px; }
+
+        /* Table */
+        .table-container { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        td { padding: 1rem; border-bottom: 1px solid var(--border); }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success { background: #dcfce7; color: #166534; }
+
+        /* Points Section */
+        .points-overview { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .point-card.primary {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+
+        .point-card.primary i { width: 48px; height: 48px; margin-bottom: 1rem; }
+        .big-points { font-size: 3rem; font-weight: 700; margin: 0.5rem 0; }
+
+        .progress-bar-container {
+            background: var(--border);
+            height: 12px;
+            border-radius: 6px;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .progress-bar {
+            background: var(--primary);
+            height: 100%;
+            border-radius: 6px;
+        }
+
+        .point-log { list-style: none; }
+        .point-log li {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Privileges Grid */
+        .privilege-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .privilege-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .privilege-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .privilege-image { height: 160px; background: #eee; position: relative; }
+        .privilege-image .badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .privilege-content { padding: 1.25rem; }
+        .privilege-content h4 { margin-bottom: 0.5rem; }
+        .privilege-content p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+
+        /* States */
+        .hidden { display: none !important; }
+        .empty-placeholder {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .large-icon { width: 64px; height: 64px; margin-bottom: 1.5rem; opacity: 0.5; }
+
+        /* Mobile Nav */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            justify-content: space-around;
+            padding: 0.75rem;
+            z-index: 1000;
+        }
+
+        .mobile-nav-item { color: var(--text-muted); }
+        .mobile-nav-item.active { color: var(--primary); }
+
+        /* Utilities */
+        .mt-20 { margin-top: 20px; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding-bottom: 80px; }
+            .mobile-nav { display: flex; }
+            .header { flex-direction: column; gap: 1rem; align-items: stretch; }
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout, .points-overview { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo-section">
+                <i data-lucide="user-check" class="logo-icon"></i>
+                <span class="logo-text">MemberHub</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-section="profile">
+                    <i data-lucide="user"></i>
+                    <span>ประวัติลูกค้า</span>
+                </li>
+                <li data-section="history">
+                    <i data-lucide="shopping-bag"></i>
+                    <span>ประวัติการซื้อ</span>
+                </li>
+                <li data-section="points">
+                    <i data-lucide="award"></i>
+                    <span>แต้มสะสม</span>
+                </li>
+                <li data-section="privileges">
+                    <i data-lucide="star"></i>
+                    <span>สิทธิพิเศษ</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="search-input" placeholder="ค้นหาด้วย เบอร์โทร หรือ รหัสสมาชิก..." autocomplete="off">
+                    <div id="search-results" class="search-results hidden"></div>
+                </div>
+                <div class="user-actions">
+                    <button class="btn-primary" id="btn-register">
+                        <i data-lucide="plus"></i> <span>ลงทะเบียนใหม่</span>
+                    </button>
+                    <button class="btn-icon"><i data-lucide="bell"></i></button>
+                    <div class="user-avatar-mini">A</div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Welcome State -->
+                <div id="welcome-state" class="state-view">
+                    <div class="empty-placeholder">
+                        <i data-lucide="users" class="large-icon"></i>
+                        <h2>ยินดีต้อนรับสู่ระบบสมาชิก</h2>
+                        <p>กรุณาค้นหาสมาชิกด้วยเบอร์โทรศัพท์หรือรหัสสมาชิกด้านบน</p>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <section id="profile-section" class="state-view hidden">
+                    <div class="card profile-header">
+                        <div class="profile-main-info">
+                            <div class="large-avatar" id="member-avatar-char">?</div>
+                            <div class="info-text">
+                                <h1 id="member-name">ชื่อ-นามสกุล</h1>
+                                <p id="member-id">รหัส: 000000</p>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-secondary" id="btn-edit-member"><i data-lucide="edit"></i> แก้ไข</button>
+                            <button class="btn-danger" id="btn-delete-member"><i data-lucide="trash-2"></i> ลบ</button>
+                        </div>
+                        <div class="quick-stats">
+                            <div class="stat">
+                                <span class="label">ระดับ</span>
+                                <span class="value" id="member-tier">Gold</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">แต้มปัจจุบัน</span>
+                                <span class="value" id="member-points">1,250</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-layout">
+                        <div class="card detail-card">
+                            <h3>ข้อมูลส่วนตัว</h3>
+                            <div class="detail-row">
+                                <i data-lucide="phone"></i>
+                                <span>เบอร์โทร:</span>
+                                <strong id="member-phone">08x-xxx-xxxx</strong>
+                            </div>
+                            <div class="detail-row">
+                                <i data-lucide="mail"></i>
+                                <span>อีเมล:</span>
+                                <strong id="member-email">-</strong>
+                            </div>
+                            <div class="detail-row">
+                                <i data-lucide="calendar"></i>
+                                <span>วันที่สมัคร:</span>
+                                <strong id="member-join-date">01/01/2023</strong>
+                            </div>
+                        </div>
+                        <div class="card chart-placeholder">
+                            <h3>สรุปการใช้บริการ</h3>
+                            <div class="service-stats">
+                                <div class="stat-item">
+                                    <span class="label">ซื้อทั้งหมด</span>
+                                    <span class="value" id="total-spend">฿0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">ครั้งที่มาใช้</span>
+                                    <span class="value" id="visit-count">0 ครั้ง</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section id="history-section" class="state-view hidden">
+                    <div class="card">
+                        <h3>ประวัติการซื้อสินค้า</h3>
+                        <div class="table-container">
+                            <table id="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>วันที่</th>
+                                        <th>รายการ</th>
+                                        <th>จำนวนเงิน</th>
+                                        <th>แต้มที่ได้</th>
+                                        <th>สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Points Section -->
+                <section id="points-section" class="state-view hidden">
+                    <div class="points-overview">
+                        <div class="card point-card primary">
+                            <div class="card-content">
+                                <i data-lucide="award"></i>
+                                <h2>แต้มสะสมทั้งหมด</h2>
+                                <p class="big-points" id="display-points">1,250</p>
+                                <span>แต้มหมดอายุ: 31 ธ.ค. 2567</span>
+                            </div>
+                        </div>
+                        <div class="card tier-progress">
+                            <h3>ระดับสมาชิก</h3>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 75%"></div>
+                            </div>
+                            <p>อีก 250 แต้ม เพื่อเลื่อนเป็นระดับ <strong>Platinum</strong></p>
+                        </div>
+                    </div>
+                    <div class="card mt-20">
+                        <h3>ประวัติการแลกแต้ม</h3>
+                        <ul class="point-log" id="points-log-list">
+                            <!-- Dynamic items -->
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Privileges Section -->
+                <section id="privileges-section" class="state-view hidden">
+                    <h3>สิทธิพิเศษเฉพาะคุณ</h3>
+                    <div class="privilege-grid" id="privilege-list">
+                        <!-- Dynamic cards -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Navigation (Bottom) -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-item active" data-section="profile">
+            <i data-lucide="user"></i>
+        </div>
+        <div class="mobile-nav-item" data-section="history">
+            <i data-lucide="shopping-bag"></i>
+        </div>
+        <div class="mobile-nav-item" data-section="points">
+            <i data-lucide="award"></i>
+        </div>
+        <div class="mobile-nav-item" data-section="privileges">
+            <i data-lucide="star"></i>
+        </div>
+    </nav>
+
+    <!-- Registration/Edit Modal -->
+    <div id="member-modal" class="modal hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2 id="modal-title">ลงทะเบียนสมาชิกใหม่</h2>
+                <button class="btn-close" id="btn-close-modal">&times;</button>
+            </div>
+            <form id="member-form">
+                <input type="hidden" id="edit-member-id">
+                <div class="form-group">
+                    <label for="input-name">ชื่อ-นามสกุล</label>
+                    <input type="text" id="input-name" required placeholder="ระบุชื่อ-นามสกุล">
+                </div>
+                <div class="form-group">
+                    <label for="input-phone">เบอร์โทรศัพท์</label>
+                    <input type="tel" id="input-phone" required placeholder="08XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="input-email">อีเมล (ถ้ามี)</label>
+                    <input type="email" id="input-email" placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="input-tier">ระดับสมาชิก</label>
+                    <select id="input-tier">
+                        <option value="Silver">Silver</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Platinum">Platinum</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-cancel">ยกเลิก</button>
+                    <button type="submit" class="btn-primary">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initial Mock Data
+        const defaultMembers = [
+            {
+                id: "MB001",
+                name: "สมชาย รักดี",
+                phone: "0812345678",
+                email: "somchai@email.com",
+                joinDate: "15/01/2023",
+                tier: "Gold",
+                points: 1250,
+                history: [
+                    { date: "10/03/2024", item: "กาแฟอาราบิก้า x2", amount: 180, points: 18, status: "สำเร็จ" },
+                    { date: "05/03/2024", item: "เค้กช็อกโกแลต", amount: 120, points: 12, status: "สำเร็จ" }
+                ],
+                pointLog: [
+                    { action: "ซื้อสินค้า", points: "+18", date: "10/03/2024" },
+                    { action: "ซื้อสินค้า", points: "+12", date: "05/03/2024" }
+                ],
+                privileges: [
+                    { title: "ส่วนลด 10% ทุกเมนู", desc: "สำหรับสมาชิกระดับ Gold ขึ้นไป", tag: "Gold Only" }
+                ]
+            }
+        ];
+
+        // App State & Persistence
+        let members = JSON.parse(localStorage.getItem('members')) || defaultMembers;
+
+        function saveToLocalStorage() {
+            localStorage.setItem('members', JSON.stringify(members));
+        }
+
+        let currentMember = null;
+        let currentSection = 'profile';
+
+        // DOM Elements
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const welcomeState = document.getElementById('welcome-state');
+        const memberModal = document.getElementById('member-modal');
+        const memberForm = document.getElementById('member-form');
+        const modalTitle = document.getElementById('modal-title');
+
+        const sections = {
+            profile: document.getElementById('profile-section'),
+            history: document.getElementById('history-section'),
+            points: document.getElementById('points-section'),
+            privileges: document.getElementById('privileges-section')
+        };
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- Live Search Logic ---
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const filtered = members.filter(m => 
+                m.phone.includes(query) || m.id.toLowerCase().includes(query.toLowerCase())
+            );
+
+            renderSearchResults(filtered);
+        });
+
+        function renderSearchResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-item">ไม่พบข้อมูล</div>';
+            } else {
+                searchResults.innerHTML = results.map(m => `
+                    <div class="search-item" onclick="selectMember('${m.id}')">
+                        <div>
+                            <div class="name">${m.name}</div>
+                            <div class="phone">${m.phone} | ${m.id}</div>
+                        </div>
+                        <i data-lucide="chevron-right" style="width:16px"></i>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+            searchResults.classList.remove('hidden');
+        }
+
+        // --- CRUD Operations ---
+
+        // Open Modal for New Member
+        document.getElementById('btn-register').addEventListener('click', () => {
+            modalTitle.textContent = "ลงทะเบียนสมาชิกใหม่";
+            memberForm.reset();
+            document.getElementById('edit-member-id').value = "";
+            memberModal.classList.remove('hidden');
+        });
+
+        // Open Modal for Edit
+        document.getElementById('btn-edit-member').addEventListener('click', () => {
+            if (!currentMember) return;
+            modalTitle.textContent = "แก้ไขข้อมูลสมาชิก";
+            document.getElementById('edit-member-id').value = currentMember.id;
+            document.getElementById('input-name').value = currentMember.name;
+            document.getElementById('input-phone').value = currentMember.phone;
+            document.getElementById('input-email').value = currentMember.email;
+            document.getElementById('input-tier').value = currentMember.tier;
+            memberModal.classList.remove('hidden');
+        });
+
+        // Delete Member
+        document.getElementById('btn-delete-member').addEventListener('click', () => {
+            if (!currentMember) return;
+            if (confirm(`คุณต้องการลบสมาชิก ${currentMember.name} ใช่หรือไม่?`)) {
+                members = members.filter(m => m.id !== currentMember.id);
+                saveToLocalStorage();
+                currentMember = null;
+                searchInput.value = "";
+                updateMemberUI();
+                showSection('profile');
+            }
+        });
+
+        // Close Modal
+        const closeModal = () => memberModal.classList.add('hidden');
+        document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+        document.getElementById('btn-cancel').addEventListener('click', closeModal);
+
+        // Form Submit (Add/Edit)
+        memberForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('edit-member-id').value;
+            const name = document.getElementById('input-name').value;
+            const phone = document.getElementById('input-phone').value;
+            const email = document.getElementById('input-email').value;
+            const tier = document.getElementById('input-tier').value;
+
+            if (editId) {
+                // Edit existing
+                const index = members.findIndex(m => m.id === editId);
+                if (index !== -1) {
+                    members[index] = { ...members[index], name, phone, email, tier };
+                    currentMember = members[index];
+                }
+            } else {
+                // Create new
+                const newId = `MB${String(members.length + 1).padStart(3, '0')}`;
+                const newMember = {
+                    id: newId,
+                    name, phone, email, tier,
+                    joinDate: new Date().toLocaleDateString('th-TH'),
+                    points: 0,
+                    history: [],
+                    pointLog: [],
+                    privileges: [
+                        { title: "ส่วนลดพิเศษ", desc: "สำหรับสมาชิกใหม่", tag: "New" }
+                    ]
+                };
+                members.push(newMember);
+                currentMember = newMember;
+            }
+
+            saveToLocalStorage();
+            closeModal();
+            updateMemberUI();
+            showSection('profile');
+            searchInput.value = currentMember.name;
+        });
+
+        // --- UI Logic ---
+        window.selectMember = (id) => {
+            currentMember = members.find(m => m.id === id);
+            searchResults.classList.add('hidden');
+            searchInput.value = currentMember.name;
+            
+            welcomeState.classList.add('hidden');
+            updateMemberUI();
+            showSection(currentSection);
+        };
+
+        function updateMemberUI() {
+            if (!currentMember) {
+                welcomeState.classList.remove('hidden');
+                Object.keys(sections).forEach(key => sections[key].classList.add('hidden'));
+                return;
+            }
+
+            welcomeState.classList.add('hidden');
+            // Profile Info
+            document.getElementById('member-name').textContent = currentMember.name;
+            document.getElementById('member-id').textContent = `รหัส: ${currentMember.id}`;
+            document.getElementById('member-avatar-char').textContent = currentMember.name.charAt(0);
+            document.getElementById('member-tier').textContent = currentMember.tier;
+            document.getElementById('member-points').textContent = currentMember.points.toLocaleString();
+            document.getElementById('display-points').textContent = currentMember.points.toLocaleString();
+            document.getElementById('member-phone').textContent = currentMember.phone;
+            document.getElementById('member-email').textContent = currentMember.email || "-";
+            document.getElementById('member-join-date').textContent = currentMember.joinDate;
+
+            // Stats
+            const totalAmount = currentMember.history.reduce((sum, h) => sum + h.amount, 0);
+            document.getElementById('total-spend').textContent = `฿${totalAmount.toLocaleString()}`;
+            document.getElementById('visit-count').textContent = `${currentMember.history.length} ครั้ง`;
+
+            // History Table
+            const historyBody = document.querySelector('#history-table tbody');
+            historyBody.innerHTML = currentMember.history.length ? currentMember.history.map(h => `
+                <tr>
+                    <td>${h.date}</td>
+                    <td>${h.item}</td>
+                    <td>฿${h.amount}</td>
+                    <td>+${h.points}</td>
+                    <td><span class="status-badge success">${h.status}</span></td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" style="text-align:center">ไม่มีประวัติการซื้อ</td></tr>';
+
+            // Points Log
+            const pointLogList = document.getElementById('points-log-list');
+            pointLogList.innerHTML = currentMember.pointLog.length ? currentMember.pointLog.map(l => `
+                <li>
+                    <div>
+                        <strong>${l.action}</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted)">${l.date}</p>
+                    </div>
+                    <span style="font-weight:600; color: ${l.points.startsWith('+') ? 'var(--success)' : '#ef4444'}">
+                        ${l.points}
+                    </span>
+                </li>
+            `).join('') : '<li style="text-align:center">ไม่มีประวัติแต้ม</li>';
+
+            // Privileges
+            const privilegeList = document.getElementById('privilege-list');
+            privilegeList.innerHTML = currentMember.privileges.map(p => `
+                <div class="privilege-card">
+                    <div class="privilege-image">
+                        <span class="badge">${p.tag}</span>
+                    </div>
+                    <div class="privilege-content">
+                        <h4>${p.title}</h4>
+                        <p>${p.desc}</p>
+                        <button class="btn-primary" style="width:100%; border-radius: 8px; font-size: 0.9rem; padding: 0.5rem; justify-content:center">
+                            กดรับสิทธิ์
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function showSection(sectionId) {
+            currentSection = sectionId;
+            document.querySelectorAll('.nav-links li, .mobile-nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.section === sectionId);
+            });
+
+            if (currentMember) {
+                Object.keys(sections).forEach(key => {
+                    sections[key].classList.toggle('hidden', key !== sectionId);
+                });
+                welcomeState.classList.add('hidden');
+            } else {
+                Object.keys(sections).forEach(key => sections[key].classList.add('hidden'));
+                welcomeState.classList.remove('hidden');
+            }
+        }
+
+        // Nav Listeners
+        document.querySelectorAll('.nav-links li, .mobile-nav-item').forEach(item => {
+            item.addEventListener('click', () => showSection(item.dataset.section));
+        });
+
+        // Initial search result close
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) searchResults.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
