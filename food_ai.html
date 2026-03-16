@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Order & Queue System</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23FF4B2B%22/><path d=%22M50 20C33.43 20 20 33.43 20 50C20 66.57 33.43 80 50 80C66.57 80 80 66.57 80 50C80 33.43 66.57 20 50 20ZM65 53H53V65H47V53H35V47H47V35H53V47H65V53Z%22 fill=%22white%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF4B2B;
+            --secondary: #FF416C;
+            --accent: #00B894;
+            --info: #0984E3;
+            --bg: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+
+        header { text-align: center; padding: 40px 0; }
+        .status-bar { display: flex; justify-content: space-around; background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-shadow: var(--shadow); }
+        .status-item { text-align: center; }
+        .status-val { font-weight: 600; color: var(--primary); font-size: 1.2rem; }
+        .status-label { font-size: 0.8rem; color: var(--text-light); }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .section-title { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+
+        /* Grid Layout */
+        .main-grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* Order Form */
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .option-item { position: relative; }
+        .option-item input { position: absolute; opacity: 0; }
+        .option-label { display: block; padding: 10px; background: #F8F9FA; border: 2px solid transparent; border-radius: 12px; text-align: center; cursor: pointer; transition: var(--transition); overflow: hidden; }
+        .option-item input:checked + .option-label { border-color: var(--primary); background: #FFF; color: var(--primary); font-weight: 600; box-shadow: 0 5px 15px rgba(255, 75, 43, 0.1); }
+        .menu-img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+
+        /* Order Summary Area */
+        .order-summary { display: none; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .price-tag { font-size: 1.5rem; font-weight: 600; color: var(--accent); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 10px; }
+        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; }
+        .btn-success { background: var(--accent); color: white; }
+
+        /* Ticket Style */
+        .ticket { border: 2px dashed #DDD; border-radius: 15px; padding: 20px; background: #FAFAFA; position: relative; }
+        .ticket-header { border-bottom: 1px solid #EEE; padding-bottom: 10px; margin-bottom: 15px; text-align: center; }
+        .queue-num { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .ticket-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        
+        /* Payment Icons */
+        .payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .pay-icon { padding: 10px; border: 1px solid #EEE; border-radius: 10px; text-align: center; font-size: 0.8rem; cursor: pointer; }
+        .pay-icon.active { border-color: var(--info); color: var(--info); background: #E1F5FE; }
+
+        .loader { display: none; text-align: center; padding: 20px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: #E1F9F1; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 style="color: var(--primary)">AI Smart Order</h1>
+        <p style="color: var(--text-light)">ระบบสั่งอาหารและจัดการคิวอัจฉริยะ</p>
+    </header>
+
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-val" id="seats-available">12</div>
+            <div class="status-label">ที่นั่งว่าง (Seats)</div>
+        </div>
+        <div class="status-item">
+            <div class="status-val" id="current-queue">A-024</div>
+            <div class="status-label">คิวปัจจุบัน</div>
+        </div>
+        <div class="status-item">
+            <div class="status-val">15-20</div>
+            <div class="status-label">รอประมาณ (นาที)</div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <!-- Left: Ordering -->
+        <div class="left-col">
+            <section class="card">
+                <div class="section-title">1. เลือกเมนูที่คุณต้องการ (รับออเดอร์)</div>
+                <div class="options-grid" id="menu-grid">
+                    <!-- Menus will be generated by JS -->
+                </div>
+
+                <div class="section-title">2. รูปแบบการบริการ</div>
+                <div class="options-grid">
+                    <div class="option-item">
+                        <input type="radio" name="service" value="dinein" id="s1" checked>
+                        <label class="option-label" for="s1">ทานที่ร้าน</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" name="service" value="takeaway" id="s2">
+                        <label class="option-label" for="s2">กลับบ้าน</label>
+                    </div>
+                </div>
+
+                <div class="section-title">3. ช่องทางการชำระเงิน</div>
+                <div class="payment-grid">
+                    <div class="pay-icon active" onclick="setPayment('QR Code', this)">📱 QR Code</div>
+                    <div class="pay-icon" onclick="setPayment('เงินสด', this)">💵 เงินสด</div>
+                    <div class="pay-icon" onclick="setPayment('บัตรเครดิต', this)">💳 บัตรเครดิต</div>
+                </div>
+
+                <button class="btn btn-primary" onclick="processOrder()">⚡ ยืนยันคำสั่งซื้อและรับคิว</button>
+            </section>
+        </div>
+
+        <!-- Right: Summary & Ticket -->
+        <div class="right-col">
+            <div class="loader" id="order-loader">
+                <p>กำลังประมวลผลออเดอร์...</p>
+            </div>
+
+            <div class="order-summary" id="order-result">
+                <section class="card ticket">
+                    <div class="ticket-header">
+                        <div class="badge badge-green">ยืนยันออเดอร์เรียบร้อย</div>
+                        <div class="queue-num" id="res-queue">A-025</div>
+                        <p style="font-weight: 600">ลำดับคิวของคุณ</p>
+                    </div>
+
+                    <div class="ticket-row">
+                        <span>เมนู:</span>
+                        <span id="res-menu" style="font-weight: 600">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>ราคาต่อหน่วย:</span>
+                        <span id="res-price">-</span>
+                    </div>
+                    <div class="ticket-row" style="border-top: 1px dashed #DDD; padding-top: 5px; margin-top: 10px;">
+                        <span style="font-weight: 600">ราคารวมทั้งสิ้น:</span>
+                        <span class="price-tag" id="res-total">฿0</span>
+                    </div>
+
+                    <div class="ticket-row" style="margin-top: 15px;">
+                        <span>เวลารอโดยประมาณ:</span>
+                        <span id="res-wait" style="color: var(--secondary); font-weight: 600">12 นาที</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>รูปแบบ:</span>
+                        <span id="res-service">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span>ชำระผ่าน:</span>
+                        <span id="res-payment">-</span>
+                    </div>
+
+                    <button class="btn btn-success" style="margin-top: 20px;" onclick="window.print()">🖨️ พิมพ์ใบเสร็จ/คิว</button>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const menus = [
+        { id: 1, name: "ข้าวกะเพราหมูสับไข่ดาว", price: 65, wait: 8, img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=300&q=80" },
+        { id: 2, name: "ข้าวผัดทะเล", price: 85, wait: 10, img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=300&q=80" },
+        { id: 3, name: "ราเมงทงคัตสึพรีเมียม", price: 149, wait: 12, img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&q=80" },
+        { id: 4, name: "สเต็กไก่สไปซี่", price: 99, wait: 15, img: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=300&q=80" },
+        { id: 5, name: "สลัดอกไก่ไข่ต้ม", price: 89, wait: 5, img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" },
+        { id: 6, name: "ผัดไทยกุ้งสด", price: 95, wait: 10, img: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&w=300&q=80" },
+        { id: 7, name: "ต้มยำกุ้งน้ำข้น", price: 150, wait: 15, img: "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=300&q=80" },
+        { id: 8, name: "ข้าวเหนียวมะม่วง", price: 120, wait: 5, img: "https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=300&q=80" },
+        { id: 9, name: "ชามะนาวเย็น", price: 45, wait: 3, img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=300&q=80" }
+    ];
+
+    let selectedPayment = 'QR Code';
+    let queueCounter = 25;
+    let availableSeats = 12;
+
+    // Initial Load
+    window.onload = () => {
+        const grid = document.getElementById('menu-grid');
+        menus.forEach(item => {
+            grid.innerHTML += `
+                <div class="option-item">
+                    <input type="radio" name="food" value="${item.id}" id="f${item.id}">
+                    <label class="option-label" for="f${item.id}">
+                        <img src="${item.img}" class="menu-img" alt="${item.name}">
+                        <div style="font-size: 0.85rem; line-height: 1.2; height: 2.4rem; overflow: hidden; margin-bottom: 4px;">${item.name}</div>
+                        <div style="color: var(--accent); font-weight: 600">฿${item.price}</div>
+                    </label>
+                </div>
+            `;
+        });
+        // Default check first item
+        document.getElementById('f1').checked = true;
+    };
+
+    function setPayment(type, el) {
+        selectedPayment = type;
+        document.querySelectorAll('.pay-icon').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function processOrder() {
+        const loader = document.getElementById('order-loader');
+        const result = document.getElementById('order-result');
+        const menuId = document.querySelector('input[name="food"]:checked').value;
+        const serviceType = document.querySelector('input[name="service"]:checked').value;
+        
+        const selectedMenu = menus.find(m => m.id == menuId);
+
+        // UI Logic
+        result.style.display = 'none';
+        loader.style.display = 'block';
+
+        setTimeout(() => {
+            loader.style.display = 'none';
+            result.style.display = 'block';
+
+            // Generate Queue
+            const qCode = "A-" + String(queueCounter).padStart(3, '0');
+            queueCounter++;
+
+            // Update Seats (Simulation)
+            if(serviceType === 'dinein' && availableSeats > 0) {
+                availableSeats--;
+                document.getElementById('seats-available').innerText = availableSeats;
+            }
+
+            // Fill Ticket Data
+            document.getElementById('res-queue').innerText = qCode;
+            document.getElementById('res-menu').innerText = selectedMenu.name;
+            document.getElementById('res-price').innerText = `฿${selectedMenu.price} / หน่วย`;
+            document.getElementById('res-total').innerText = `฿${selectedMenu.price}`;
+            document.getElementById('res-wait').innerText = `${selectedMenu.wait} - ${selectedMenu.wait + 5} นาที`;
+            document.getElementById('res-service').innerText = serviceType === 'dinein' ? 'ทานที่ร้าน' : 'กลับบ้าน';
+            document.getElementById('res-payment').innerText = selectedPayment;
+
+            // Scroll to result on mobile
+            if(window.innerWidth < 850) {
+                result.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
